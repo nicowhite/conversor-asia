@@ -83,7 +83,19 @@
             color: var(--muted);
         }
 
-        .country-btn .flag { font-size: 1.7rem; line-height: 1.1; }
+        .flag-img {
+            display: block;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 0 1.5px #fff, 0 2px 6px rgba(0,0,0,0.18);
+        }
+        .country-btn .flag-img {
+            width: 36px;
+            height: 36px;
+            margin-bottom: 4px;
+            transition: transform 0.2s ease;
+        }
+        .country-btn.active .flag-img { transform: scale(1.1); }
         .country-btn .cname { font-size: 0.7rem; font-weight: 600; }
 
         .country-btn.active {
@@ -118,7 +130,7 @@
             width: 100%;
         }
 
-        .flag-icon { font-size: 1.4rem; margin-right: 10px; }
+        .flag-icon { width: 24px; height: 24px; margin-right: 10px; }
 
         .currency-name {
             font-weight: 600;
@@ -200,7 +212,7 @@
 
     <div class="input-wrapper">
         <div class="label-row">
-            <span class="flag-icon" id="localFlag"></span>
+            <img class="flag-img flag-icon" id="localFlag" alt="">
             <span class="currency-name" id="localName"></span>
         </div>
         <input type="text" inputmode="decimal" id="localInput" placeholder="0" autocomplete="off">
@@ -208,7 +220,7 @@
 
     <div class="input-wrapper">
         <div class="label-row">
-            <span class="flag-icon">🇺🇸</span>
+            <img class="flag-img flag-icon" src="flags/us.svg" alt="">
             <span class="currency-name">Dólares (USD)</span>
         </div>
         <input type="text" inputmode="decimal" id="usdInput" placeholder="0" autocomplete="off">
@@ -216,7 +228,7 @@
 
     <div class="input-wrapper">
         <div class="label-row">
-            <span class="flag-icon">🇺🇾</span>
+            <img class="flag-img flag-icon" src="flags/uy.svg" alt="">
             <span class="currency-name">Pesos Uruguayos (UYU)</span>
         </div>
         <input type="text" inputmode="decimal" id="uyuInput" placeholder="0" autocomplete="off">
@@ -238,10 +250,10 @@
 
     // Países del viaje. "ref" es el monto de ejemplo que se muestra abajo.
     const COUNTRIES = [
-        { code: 'MYR', country: 'Malasia',   flag: '🇲🇾', name: 'Ringgit (MYR)', ref: 10,     decimals: 2, color: '#0b3d91' },
-        { code: 'VND', country: 'Vietnam',   flag: '🇻🇳', name: 'Dong (VND)',    ref: 100000, decimals: 0, color: '#c8102e' },
-        { code: 'SGD', country: 'Singapur',  flag: '🇸🇬', name: 'Dólar de Singapur (SGD)', ref: 10, decimals: 2, color: '#a21caf' },
-        { code: 'THB', country: 'Tailandia', flag: '🇹🇭', name: 'Baht (THB)',    ref: 100,    decimals: 0, color: '#b45309' }
+        { code: 'MYR', country: 'Malasia',   flag: 'my', name: 'Ringgit (MYR)', ref: 10,     decimals: 2, color: '#0b3d91' },
+        { code: 'VND', country: 'Vietnam',   flag: 'vn', name: 'Dong (VND)',    ref: 100000, decimals: 0, color: '#c8102e' },
+        { code: 'SGD', country: 'Singapur',  flag: 'sg', name: 'Dólar de Singapur (SGD)', ref: 10, decimals: 2, color: '#a21caf' },
+        { code: 'THB', country: 'Tailandia', flag: 'th', name: 'Baht (THB)',    ref: 100,    decimals: 0, color: '#b45309' }
     ];
 
     let rates = {};
@@ -272,7 +284,7 @@
     function renderCountries() {
         $('countries').innerHTML = COUNTRIES.map((c, i) => `
             <button class="country-btn ${c.code === current.code ? 'active' : ''}" onclick="selectCountry(${i})">
-                <span class="flag">${c.flag}</span>
+                <img class="flag-img" src="flags/${c.flag}.svg" alt="">
                 <span class="cname">${c.country}</span>
             </button>
         `).join('');
@@ -282,7 +294,7 @@
         current = COUNTRIES[i];
         try { localStorage.setItem('asiaTripCountry', current.code); } catch (e) {}
         document.documentElement.style.setProperty('--primary-color', current.color);
-        $('localFlag').textContent = current.flag;
+        $('localFlag').src = `flags/${current.flag}.svg`;
         $('localName').textContent = current.name;
         renderCountries();
         // Mantener el monto en USD y recalcular para el nuevo país
