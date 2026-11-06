@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Asia Trip - Currency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Asia Trip">
+    <meta name="theme-color" content="#0f766e">
+    <style>
+        :root {
+            --primary-color: #0f766e;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: #ffffff;
+            --text-color: #2d3436;
+            --muted: #636e72;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px 0;
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 92%;
+            max-width: 420px;
+            background: var(--card-bg);
+            padding: 28px 24px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        header { margin-bottom: 20px; }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        /* Selector de país */
+        .countries {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .country-btn {
+            font-family: inherit;
+            border: 2px solid transparent;
+            background: #f1f2f6;
+            border-radius: 14px;
+            padding: 10px 4px 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: all 0.2s ease;
+            color: var(--muted);
+        }
+
+        .country-btn .flag { font-size: 1.7rem; line-height: 1.1; }
+        .country-btn .cname { font-size: 0.7rem; font-weight: 600; }
+
+        .country-btn.active {
+            background: #fff;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+        }
+
+        .input-wrapper {
+            background: #f1f2f6;
+            border-radius: 15px;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary-color);
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .label-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            width: 100%;
+        }
+
+        .flag-icon { font-size: 1.4rem; margin-right: 10px; }
+
+        .currency-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            outline: none;
+            padding: 5px 0;
+        }
+
+        .reference {
+            margin-top: 5px;
+            padding: 14px;
+            background: #f0fdfa;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            line-height: 1.7;
+        }
+
+        .reference strong { color: var(--primary-color); }
+
+        .clear-btn {
+            font-family: inherit;
+            margin-top: 14px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.85rem;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .rates-info {
+            margin-top: 14px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #8a979c;
+            line-height: 1.6;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #00b894;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-dot.offline { background-color: #fdcb6e; }
+        .status-dot.error { background-color: #d63031; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>ASIA TRIP</h1>
+        <p>Conversor de Moneda en Tiempo Real</p>
+    </header>
+
+    <div class="countries" id="countries"></div>
+
+    <div class="input-wrapper">
+        <div class="label-row">
+            <span class="flag-icon" id="localFlag"></span>
+            <span class="currency-name" id="localName"></span>
+        </div>
+        <input type="text" inputmode="decimal" id="localInput" placeholder="0" autocomplete="off">
+    </div>
+
+    <div class="input-wrapper">
+        <div class="label-row">
+            <span class="flag-icon">🇺🇸</span>
+            <span class="currency-name">Dólares (USD)</span>
+        </div>
+        <input type="text" inputmode="decimal" id="usdInput" placeholder="0" autocomplete="off">
+    </div>
+
+    <div class="input-wrapper">
+        <div class="label-row">
+            <span class="flag-icon">🇺🇾</span>
+            <span class="currency-name">Pesos Uruguayos (UYU)</span>
+        </div>
+        <input type="text" inputmode="decimal" id="uyuInput" placeholder="0" autocomplete="off">
+    </div>
+
+    <div class="reference" id="reference"></div>
+
+    <button class="clear-btn" onclick="clearAll()">Borrar todo</button>
+
+    <div class="rates-info" id="rateInfo">
+        <span class="status-dot"></span> Obteniendo tasas de cambio...
+    </div>
+</div>
+
+<script>
+    const API_KEY = '838b6922d1053b32a8247428';
+    const URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`;
+    const CACHE_KEY = 'asiaTripRates';
+
+    // Países del viaje. "ref" es el monto de ejemplo que se muestra abajo.
+    const COUNTRIES = [
+        { code: 'MYR', country: 'Malasia',   flag: '🇲🇾', name: 'Ringgit (MYR)', ref: 10,     decimals: 2, color: '#0b3d91' },
+        { code: 'VND', country: 'Vietnam',   flag: '🇻🇳', name: 'Dong (VND)',    ref: 100000, decimals: 0, color: '#c8102e' },
+        { code: 'SGD', country: 'Singapur',  flag: '🇸🇬', name: 'Dólar de Singapur (SGD)', ref: 10, decimals: 2, color: '#d0021b' },
+        { code: 'THB', country: 'Tailandia', flag: '🇹🇭', name: 'Baht (THB)',    ref: 100,    decimals: 0, color: '#241d4f' }
+    ];
+
+    let rates = {};
+    let current = COUNTRIES[0];
+
+    const $ = id => document.getElementById(id);
+
+    // Formato uruguayo: 1.250.000,50
+    function fmt(value, decimals) {
+        return value.toLocaleString('es-UY', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+    }
+
+    // Acepta "1.250.000", "1250000", "12,5" o "12.5"
+    function parse(text) {
+        let t = String(text).replace(/\s/g, '');
+        if (!t) return NaN;
+        if (t.includes(',')) {
+            t = t.replace(/\./g, '').replace(',', '.');
+        } else if ((t.match(/\./g) || []).length > 1 || /\.\d{3}$/.test(t)) {
+            t = t.replace(/\./g, '');
+        }
+        return parseFloat(t);
+    }
+
+    function renderCountries() {
+        $('countries').innerHTML = COUNTRIES.map((c, i) => `
+            <button class="country-btn ${c.code === current.code ? 'active' : ''}" onclick="selectCountry(${i})">
+                <span class="flag">${c.flag}</span>
+                <span class="cname">${c.country}</span>
+            </button>
+        `).join('');
+    }
+
+    function selectCountry(i) {
+        current = COUNTRIES[i];
+        try { localStorage.setItem('asiaTripCountry', current.code); } catch (e) {}
+        document.documentElement.style.setProperty('--primary-color', current.color);
+        $('localFlag').textContent = current.flag;
+        $('localName').textContent = current.name;
+        renderCountries();
+        // Mantener el monto en USD y recalcular para el nuevo país
+        if ($('usdInput').value) convert('USD'); else clearAll();
+        renderReference();
+    }
+
+    function renderReference() {
+        const r = rates[current.code];
+        if (!r || !rates.UYU) { $('reference').innerHTML = ''; return; }
+        const usd = current.ref / r;
+        $('reference').innerHTML = `
+            <strong>${fmt(current.ref, 0)} ${current.code}</strong>
+            ≈ US$ ${fmt(usd, 2)} ≈ <strong>$ ${fmt(usd * rates.UYU, 0)}</strong> UYU
+            <br>
+            <strong>$ 100 UYU</strong> ≈ ${fmt(100 / rates.UYU * r, current.decimals)} ${current.code}
+        `;
+    }
+
+    function convert(source) {
+        const r = rates[current.code];
+        if (!r || !rates.UYU) return;
+
+        const local = $('localInput'), usd = $('usdInput'), uyu = $('uyuInput');
+        let valInUsd;
+
+        if (source === 'LOCAL') valInUsd = parse(local.value) / r;
+        else if (source === 'USD') valInUsd = parse(usd.value);
+        else valInUsd = parse(uyu.value) / rates.UYU;
+
+        if (isNaN(valInUsd)) {
+            if (source !== 'LOCAL') local.value = '';
+            if (source !== 'USD') usd.value = '';
+            if (source !== 'UYU') uyu.value = '';
+            return;
+        }
+
+        if (source !== 'LOCAL') local.value = fmt(valInUsd * r, current.decimals);
+        if (source !== 'USD') usd.value = fmt(valInUsd, 2);
+        if (source !== 'UYU') uyu.value = fmt(valInUsd * rates.UYU, 2);
+    }
+
+    function clearAll() {
+        $('localInput').value = '';
+        $('usdInput').value = '';
+        $('uyuInput').value = '';
+    }
+
+    function showRates(updatedAt, status) {
+        const date = new Date(updatedAt);
+        const when = date.toLocaleString('es-UY', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        const lines = COUNTRIES.map(c => `1 USD = ${fmt(rates[c.code], c.code === 'VND' ? 0 : 2)} ${c.code}`).join(' | ');
+        const note = status === 'offline'
+            ? '<br>Sin conexión: usando las últimas tasas guardadas'
+            : '';
+        $('rateInfo').innerHTML = `
+            <span class="status-dot ${status === 'offline' ? 'offline' : ''}"></span>
+            ${lines} | 1 USD = ${fmt(rates.UYU, 2)} UYU
+            <br>Actualizado: ${when}${note}
+        `;
+        renderReference();
+        convert('USD');
+    }
+
+    function loadCache() {
+        try {
+            const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+            if (cached && cached.rates) return cached;
+        } catch (e) {}
+        return null;
+    }
+
+    async function getRates() {
+        // Mostrar enseguida las últimas tasas guardadas, por si no hay señal
+        const cached = loadCache();
+        if (cached) {
+            rates = cached.rates;
+            showRates(cached.updatedAt, 'offline');
+        }
+
+        try {
+            const response = await fetch(URL);
+            const data = await response.json();
+            if (data.result === 'success') {
+                rates = { UYU: data.conversion_rates.UYU };
+                COUNTRIES.forEach(c => rates[c.code] = data.conversion_rates[c.code]);
+                const updatedAt = Date.now();
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ rates, updatedAt })); } catch (e) {}
+                showRates(updatedAt, 'online');
+            } else if (!cached) {
+                throw new Error(data['error-type']);
+            }
+        } catch (error) {
+            if (!cached) {
+                $('rateInfo').innerHTML = '<span class="status-dot error"></span> No se pudieron obtener las tasas. Conectate a internet y volvé a abrir.';
+            }
+        }
+    }
+
+    $('localInput').addEventListener('input', () => convert('LOCAL'));
+    $('usdInput').addEventListener('input', () => convert('USD'));
+    $('uyuInput').addEventListener('input', () => convert('UYU'));
+
+    // Arranca en el último país elegido
+    let saved = null;
+    try { saved = localStorage.getItem('asiaTripCountry'); } catch (e) {}
+    const startIndex = Math.max(0, COUNTRIES.findIndex(c => c.code === saved));
+    selectCountry(startIndex);
+    getRates();
+</script>
+
+</body>
+</html>
